@@ -28,12 +28,12 @@ class Game:
                     return True
 
     def draw(self):
-        for column in range(self.board_height):
-            for row in range(self.board_width):
-                position = (column * self.square_size, row * self.square_size)
+        for row in range(self.board_width):
+            for column in range(self.board_height):
+                position = (row * self.square_size, column * self.square_size)
                 size = (self.square_size, self.square_size)
                 border = 1
-                if self.board.board[column][row].alive:
+                if self.board.board[row][column].alive:
                     color = (255, 0, 255)
                     pygame.draw.rect(self.surface, color, (position, size), border)
                 else:
@@ -66,33 +66,33 @@ class Board:
         neighbors = [[i, j] for i in range(-1, 2) for j in range(-1, 2) if i or j]
         for neighbor in neighbors:
             try:
-                if self.board[column + neighbor[0]][row + neighbor[1]].alive:
+                if self.board[row + neighbor[0]][column + neighbor[1]].alive:
                     counter += 1
             except IndexError:
                 pass
         return counter
 
-    def refresh(self):  # TODO kolumne z rzedem pozmieniaj
+    def refresh(self):
         self.next_generation = [[Cell() for i in range(self.width)] for j in range(self.height)]
-        for column in range(self.height):
-            for row in range(self.width):
-                alive_neighbours = self.count_alive_neighbours(column, row)
-                if self.board[column][row].alive:
+        for row in range(self.height):
+            for column in range(self.width):
+                alive_neighbours = self.count_alive_neighbours(column=column, row=row)
+                if self.board[row][column].alive:
                     if alive_neighbours in {2, 3}:
-                        self.next_generation[column][row].revive()
+                        self.next_generation[row][column].revive()
                     else:
-                        self.next_generation[column][row].kill()
+                        self.next_generation[row][column].kill()
                 else:
                     if alive_neighbours == 3:
-                        self.next_generation[column][row].revive()
+                        self.next_generation[row][column].revive()
                     else:
-                        self.next_generation[column][row].kill()
+                        self.next_generation[row][column].kill()
         self.board = self.next_generation
 
     def print(self):
-        for column in range(self.height):
-            for row in range(self.width):
-                cell = self.board[column][row].alive
+        for row in range(self.height):
+            for column in range(self.width):
+                cell = self.board[row][column].alive
                 if cell:
                     print("o", end="")
                 else:
@@ -100,13 +100,13 @@ class Board:
             print("\n")
 
     def randomize(self):
-        for column in range(self.height):
-            for row in range(self.width):
+        for row in range(self.height):
+            for column in range(self.width):
                 n = random.random()
                 if n > 0.5:
-                    self.board[column][row].revive()
+                    self.board[row][column].revive()
                 else:
-                    self.board[column][row].kill()
+                    self.board[row][column].kill()
 
 
 game = Game(400, 400, 40, 40)
